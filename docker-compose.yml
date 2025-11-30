@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  auth-service:
+    build: ./app/auth-service
+    container_name: auth-service
+    ports:
+      - "8001:8001"
+    networks:
+      - backend
+
+  todo-service:
+    build: ./app/todo-service
+    container_name: todo-service
+    ports:
+      - "8002:8002"
+    networks:
+      - backend
+
+  api-gateway:
+    build: ./app/api-gateway
+    container_name: api-gateway
+    ports:
+      - "8090:80"
+    depends_on:
+      - auth-service
+      - todo-service
+    networks:
+      - backend
+
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: devopsdb
+    ports:
+      - "5433:5432"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
